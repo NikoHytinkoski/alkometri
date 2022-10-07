@@ -5,30 +5,39 @@ import { Picker } from '@react-native-picker/picker';
 import { useState } from 'react';
 import styles from './styles';
 
+//testattu oneplus 6 puhelimella ja todettu toimivaksi ainakin androidissa
+
 export default function App() {
+  const [type, setType] = useState(0)
   const [weight, setWeight] = useState(0)
   const [amount, setAmount] = useState(0)
   const [gender, setGender] = useState('male')
   const [time, setTime] = useState(0)
   const [alcohol, setAlcohol] = useState(0)
 
+const types = [
+  {label : 'beer',value: 4.5},
+  {label : 'wine',value: 38.5},
+  {label : 'spirits',value: 55.5},
+  {label : 'Nikin Speciaali',value: 72},
+]
 
 const amounts = [
-    {label: '1 Bottle',value: 1},
-    {label: '2 Bottle',value: 2},
-    {label: '3 Bottle',value: 3},
-    {label: '4 Bottle',value: 4},
-    {label: '5 Bottle',value: 5},
-    {label: '6 Bottle',value: 6},
-    {label: '7 Bottle',value: 7},
-    {label: '8 Bottle',value: 8},
-    {label: '9 Bottle',value: 9},
-    {label: '10 Bottle',value: 10},
-    {label: '11 Bottle',value: 11},
-    {label: '12 Bottle',value: 12},
-    {label: '13 Bottle',value: 13},
-    {label: '14 Bottle',value: 14},
-    {label: '15 Bottle',value: 15},
+    {label: '1 bottle',value: 1},
+    {label: '2 bottles',value: 2},
+    {label: '3 bottles',value: 3},
+    {label: '4 bottles',value: 4},
+    {label: '5 bottles',value: 5},
+    {label: '6 bottles',value: 6},
+    {label: '7 bottles',value: 7},
+    {label: '8 bottles',value: 8},
+    {label: '9 bottles',value: 9},
+    {label: '10 bottles',value: 10},
+    {label: '11 bottles',value: 11},
+    {label: '12 bottles',value: 12},
+    {label: '13 bottles',value: 13},
+    {label: '14 bottles',value: 14},
+    {label: '15 bottles',value: 15},
 ]
 const times = [
   {label: '1 Hour',value: 1},
@@ -64,15 +73,16 @@ const times = [
   ]
   
   const calculate = () => {
-    let result = 0
-    let litres = amount * 0.33
-    let grams = litres * 8 * 4.5
-    let burning = weight / 10
-    let gramsleft = grams - (burning * time)
-    let promillesMale = gramsleft / (weight * 0.7)
-    let promillesFemale = gramsleft / (weight * 0.6)
+    console.log(time)
+    
+    let litres = amount * 0.33;
+    let grams = litres * 8 * type;
+    let burning = weight / 10;
+    let gramsleft = grams - (burning * time);
+    let promillesMale = gramsleft / (weight * 0.7);
+    let promillesFemale = gramsleft / (weight * 0.6);
 
-
+    
     if (gender === 'male') {
          setAlcohol(promillesMale)  
          if (promillesMale < 0) {setAlcohol(0)}
@@ -81,7 +91,7 @@ const times = [
       if (promillesFemale < 0) {setAlcohol(0)}
     }
     if (weight == 0) alert ('need weight to calculate') 
-    setAlcohol(result)
+    if (alcohol > 3) alert ('call a medic')
   } 
 
   return (
@@ -90,31 +100,42 @@ const times = [
       <Text style={styles.Header}>Alcohol measurement apparatus </Text>
      <Text style={styles.Titles}>Weight</Text>
      <TextInput style={styles.Box} placeholder='enter your weight...' value={weight} onChangeText={text => setWeight(text)} keyboardType='number-pad' />
+
+     <Text style={styles.Titles}>What did you drink?</Text>
+     <Picker style={styles.picker} onValueChange={(itemValue)=> setType(itemValue)} selectedValue={type}>
+      {
+        types.map((type,index) => (
+        <Picker.Item key={index} label={type.label} value={type.value} />
+        ))
+      }
+     </Picker>
      <Text style={styles.Titles}>Amount</Text>
      <Picker style={styles.picker} onValueChange={(itemValue)=> setAmount(itemValue)} selectedValue={amount}>
       {
-        amounts.map((amount,index) => {
+        amounts.map((amount,index) => (
         <Picker.Item key={index} label={amount.label} value={amount.value} />
-        })
+        ))
       }
      </Picker>
      <Text style={styles.Titles}>Time</Text>
      <Picker style={styles.picker} onValueChange={(itemValue)=> setTime(itemValue)} selectedValue={time}>
       {
-        times.map((time,index) => {
+        times.map((time,index) => (
         <Picker.Item key={index} label={time.label} value={time.value} />
-        })
+        ))
       }
      </Picker>
       <Text style={styles.Titles}>Gender</Text>
       <RadioForm
-      buttonSize={10}
+      buttonSize={20}
       radio_props={genders}
       initial={0}
-      onPress={(value) => setGender(value)}
+      onPress={(value) => {setGender(value)}}
       />
-     <Text>{alcohol.toFixed(0)}</Text>
-     <Button title='Calculate' onPress={calculate} />
+     
+     <Button title='Calculate' onPress={calculate} ></Button>
+     <Text style= {[alcohol <= 0.5 ? styles.green : alcohol >= 0.5 && alcohol <= 1.2 ? styles.yellow : styles.red]}> {alcohol.toFixed(2)} promillea</Text>
+     
     </View>
   );
 }
